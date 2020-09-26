@@ -1,4 +1,5 @@
 //https://andy6804tw.github.io/2018/02/11/nodejs-crawler/#%E5%AE%89%E8%A3%9D-request-%E8%88%87-cheerio
+//需知道網頁DOM結構
 require('dotenv').config();
 const request = require("request");
 const cheerio = require("cheerio");

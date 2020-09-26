@@ -1,6 +1,9 @@
 //https://codertw.com/ios/20272/
+//需知道網頁DOM結構
 require('dotenv').config();
 const fs = require("fs");
+const Nightmare = require('nightmare');          // 自動化測試包，處理動態頁面
+const nightmare = Nightmare({ show: false });     // show:true  顯示內建模擬瀏覽器
 
 // 引入所需要的第三方包
 const superagent = require('superagent');
@@ -30,16 +33,17 @@ let getHotNews = (res) => {
     });
     return hotNews;
 };
-let getLocalNews = (res) => {
+
+let getLocalNews = (htmlStr) => {
     let localNews = [];
-    let $ = cheerio.load(res);
+    let $ = cheerio.load(htmlStr);
     // 本地新聞
     $('ul#localnews-focus li a').each((idx, ele) => {
         let news = {
             title: $(ele).text(),
             href: $(ele).attr('href'),
         };
-        localNews.push(news);
+        localNews.push(news)
     });
     // 本地資訊
     $('div#localnews-zixun ul li a').each((index, item) => {
@@ -49,10 +53,30 @@ let getLocalNews = (res) => {
         };
         localNews.push(news);
     });
-    return localNews;
-};
+    return localNews
+}
 
 const crawler = () => {
+    nightmare
+        .goto('http://news.baidu.com/')
+        .wait("div#local_news")
+        .evaluate(() => document.querySelector("div#local_news").innerHTML)
+        .then(htmlStr => {
+            // 獲取本地新聞資料
+            localNews = getLocalNews(htmlStr);
+            fs.writeFileSync(__dirname + "/" + process.env.RESULT_NAME + ".json", JSON.stringify({
+                hotNews: hotNews,
+                localNews: localNews
+            }));
+            console.log({
+                hotNews: hotNews,
+                localNews: localNews
+            });
+        })
+        .catch(error => {
+            console.log(`本地新聞抓取失敗 - ${error}`);
+            fs.writeFileSync(__dirname + "/" + process.env.RESULT_NAME + ".json", JSON.stringify(`熱點新聞抓取失敗 - ${err}`));
+        });
     superagent.get('http://news.baidu.com/').end((err, res) => {
         if (err) {
             // 如果訪問失敗或者出錯，會這行這裡
@@ -62,15 +86,6 @@ const crawler = () => {
             // 訪問成功，請求http://news.baidu.com/頁面所返回的資料會包含在res
             // 抓取熱點新聞資料
             hotNews = getHotNews(res);
-            localNews = getLocalNews(res);
-            fs.writeFileSync(__dirname + "/" + process.env.RESULT_NAME + ".json", JSON.stringify({
-                hotNews: hotNews,
-                localNews: localNews
-            }));
-            console.log({
-                hotNews: hotNews,
-                localNews: localNews
-            });
         }
     });
 }
