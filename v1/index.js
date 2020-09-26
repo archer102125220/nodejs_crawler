@@ -7,7 +7,7 @@ const fs = require("fs");
 
 const earthquake = function () {
   request({
-    url: "http://www.cwb.gov.tw/V7/modules/MOD_EC_Home.htm", // 中央氣象局網頁
+    url: process.env.URL ? "http://" + process.env.URL : "http://www.cwb.gov.tw/V7/modules/MOD_EC_Home.htm", // 中央氣象局網頁
     method: "GET"
   }, function (error, response, body) {
     if (error || !body) {

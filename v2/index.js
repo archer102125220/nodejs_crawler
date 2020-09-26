@@ -58,7 +58,7 @@ let getLocalNews = (htmlStr) => {
 
 const crawler = () => {
     nightmare
-        .goto('http://news.baidu.com/')
+        .goto(process.env.URL ? "http://" + process.env.URL : 'http://news.baidu.com/')
         .wait("div#local_news")
         .evaluate(() => document.querySelector("div#local_news").innerHTML)
         .then(htmlStr => {
@@ -77,17 +77,18 @@ const crawler = () => {
             console.log(`本地新聞抓取失敗 - ${error}`);
             fs.writeFileSync(__dirname + "/" + process.env.RESULT_NAME + ".json", JSON.stringify(`熱點新聞抓取失敗 - ${err}`));
         });
-    superagent.get('http://news.baidu.com/').end((err, res) => {
-        if (err) {
-            // 如果訪問失敗或者出錯，會這行這裡
-            console.log(`熱點新聞抓取失敗 - ${err}`);
-            fs.writeFileSync(__dirname + "/" + process.env.RESULT_NAME + ".json", JSON.stringify(`熱點新聞抓取失敗 - ${err}`));
-        } else {
-            // 訪問成功，請求http://news.baidu.com/頁面所返回的資料會包含在res
-            // 抓取熱點新聞資料
-            hotNews = getHotNews(res);
-        }
-    });
+    superagent.get(process.env.URL ? "http://" + process.env.URL : 'http://news.baidu.com/')
+        .end((err, res) => {
+            if (err) {
+                // 如果訪問失敗或者出錯，會這行這裡
+                console.log(`熱點新聞抓取失敗 - ${err}`);
+                fs.writeFileSync(__dirname + "/" + process.env.RESULT_NAME + ".json", JSON.stringify(`熱點新聞抓取失敗 - ${err}`));
+            } else {
+                // 訪問成功，請求http://news.baidu.com/頁面所返回的資料會包含在res
+                // 抓取熱點新聞資料
+                hotNews = getHotNews(res);
+            }
+        });
 }
 crawler();
 
