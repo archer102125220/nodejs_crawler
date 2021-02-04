@@ -1,7 +1,7 @@
 //https://codertw.com/ios/20272/
 //需知道網頁DOM結構
 require('dotenv').config();
-const fs = require("fs");
+const fs = require('fs');
 const Nightmare = require('nightmare');          // 自動化測試包，處理動態頁面
 const nightmare = Nightmare({ show: false });     // show:true  顯示內建模擬瀏覽器
 
@@ -21,6 +21,7 @@ let getHotNews = (res) => {
     以後就可以使用類似jQuery的$(selectior)的方式來獲取頁面元素
     */
     let $ = cheerio.load(res.text);
+    console.log($);
     // 找到目標資料所在的頁面元素，獲取資料
     $('div#pane-news ul li a').each((idx, ele) => {
         // cherrio中$('selector').each()用來遍歷所有匹配到的DOM元素
@@ -58,13 +59,13 @@ let getLocalNews = (htmlStr) => {
 
 const crawler = () => {
     nightmare
-        .goto(process.env.URL ? "http://" + process.env.URL : 'http://news.baidu.com/')
-        .wait("div#local_news")
-        .evaluate(() => document.querySelector("div#local_news").innerHTML)
+        .goto(process.env.URL ? 'http://' + process.env.URL : 'http://news.baidu.com/')
+        .wait('div#local_news')
+        .evaluate(() => document.querySelector('div#local_news').innerHTML)
         .then(htmlStr => {
             // 獲取本地新聞資料
             localNews = getLocalNews(htmlStr);
-            fs.writeFileSync(__dirname + "/" + process.env.RESULT_NAME + ".json", JSON.stringify({
+            fs.writeFileSync(__dirname + '/' + process.env.RESULT_NAME + '.json', JSON.stringify({
                 hotNews: hotNews,
                 localNews: localNews
             }));
@@ -75,14 +76,14 @@ const crawler = () => {
         })
         .catch(error => {
             console.log(`本地新聞抓取失敗 - ${error}`);
-            fs.writeFileSync(__dirname + "/" + process.env.RESULT_NAME + ".json", JSON.stringify(`熱點新聞抓取失敗 - ${err}`));
+            fs.writeFileSync(__dirname + '/' + process.env.RESULT_NAME + '.json', JSON.stringify(`熱點新聞抓取失敗 - ${err}`));
         });
-    superagent.get(process.env.URL ? "http://" + process.env.URL : 'http://news.baidu.com/')
+    superagent.get(process.env.URL ? 'http://' + process.env.URL : 'http://news.baidu.com/')
         .end((err, res) => {
             if (err) {
                 // 如果訪問失敗或者出錯，會這行這裡
                 console.log(`熱點新聞抓取失敗 - ${err}`);
-                fs.writeFileSync(__dirname + "/" + process.env.RESULT_NAME + ".json", JSON.stringify(`熱點新聞抓取失敗 - ${err}`));
+                fs.writeFileSync(__dirname + '/' + process.env.RESULT_NAME + '.json', JSON.stringify(`熱點新聞抓取失敗 - ${err}`));
             } else {
                 // 訪問成功，請求http://news.baidu.com/頁面所返回的資料會包含在res
                 // 抓取熱點新聞資料
