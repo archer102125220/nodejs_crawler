@@ -2,8 +2,6 @@
 
 
 .env
-yarn-error.log
-yarn.lock
 
 # dependencies
 /node_modules
