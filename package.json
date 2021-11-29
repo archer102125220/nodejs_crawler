@@ -10,6 +10,7 @@
     "nightmare": "^3.0.2",
     "nightmare-iframe-manager": "^0.0.4",
     "nightmare-load-filter": "^0.2.0",
+    "puppeteer": "^7.0.0",
     "request": "^2.88.2",
     "superagent": "^6.1.0"
   },
