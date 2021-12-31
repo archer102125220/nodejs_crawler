@@ -21,6 +21,19 @@ async function crawler() {
   try {
     let count = 1;
     if (fs.existsSync(__dirname + "/output") === false) fs.mkdirSync(__dirname + "/output");
+    // const writeStream = fs.createWriteStream(__dirname + '/temp.mp4');
+    // writeStream.
+    //   on('finish', function () {
+    //     try {
+    //       fs.renameSync(__dirname + "/temp.mp4", __dirname + "/" + videoName + '.mp4');
+    //     }
+    //     catch (e) {
+    //       console.log('file rename fail！');
+    //       console.log(e);
+    //     }
+    //     console.log('Download Done！');
+    //   });
+    // const urlList = [];
     const videoName = await nightmare
       .on('did-get-response-details', function (a, b, responseDetails = '') {
         if (
@@ -43,6 +56,7 @@ async function crawler() {
           superagent
             .get(responseDetails)
             .pipe(writeStream);
+          urlList.push(responseDetails);
           count++;
         }
       })
@@ -74,8 +88,14 @@ async function crawler() {
       }
     }
     console.log('Downloaded！');
+    // require('events').EventEmitter.defaultMaxListeners = urlList.length + 1;
+    // for (let i = 0; i < urlList.length; i++) {
+    //   superagent
+    //     .get(urlList[i])
+    //     .pipe(writeStream);
+    // }
   } catch (error) {
-    console.log(`影片擷取失敗 - ${error}`);
+    console.log(`video Download fail - ${error}`);
   }
 }
 
